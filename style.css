@@ -1,0 +1,147 @@
+/*
+* Stylesheet for "YouTube Comments" Wordpress plugin
+*/
+
+#youtube-comments {
+	border: 1px solid #d3d3d3;
+	color: #333;
+	font-size: 13px;
+	padding: 20px;
+}
+
+#youtube-comments a {
+	color: #2793E6;
+	text-decoration: none;
+}
+
+#youtube-comments a:hover {
+	text-decoration: underline;
+}
+
+#youtube-comments .post-comment-login {
+	background: #eee;
+	border: 1px solid #ccc;
+	height: 48px;
+	margin: 0 0 30px 0;
+	padding: 0 6px;
+}
+
+#youtube-comments .post-comment-form {
+	margin-bottom: 10px;
+	position: relative;
+}
+
+#youtube-comments .post-comment-text {
+	border: 1px solid #d3d3d3;
+	height: 60px;
+	width: 98%;
+}
+
+#youtube-comments .post-comment-logout {
+	color: #2793E6;
+	cursor: pointer;
+}
+
+#youtube-comments .post-comment-logout:hover {
+	text-decoration: underline;
+}
+
+#youtube-comments .post-comment-controls {
+	overflow: hidden;
+}
+
+#youtube-comments .post-comment-submit {
+	float: right;
+	margin: 8px 0 0 0;
+	padding: 0 8px;
+}
+
+#youtube-comments .comments-loading {
+	text-align: center;
+}
+
+#youtube-comments .comments-loading img {
+	border-radius: 0;
+	box-shadow: none;
+	margin-right: 10px;
+	width: 16px;
+	vertical-align: middle;
+}
+
+#youtube-comments h4.comments-heading {
+	font-size: 13px;
+	margin: 0 0 20px 0;
+}
+
+#youtube-comments li.comment-item {
+	list-style-type: none;
+	position: relative;
+	margin: 0 0 30px 0;
+}
+
+#youtube-comments .comment-content {
+	margin-left: 60px;
+}
+	
+#youtube-comments a.author-name {
+	color: #2793e6;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+#youtube-comments span.comment-posted {
+	color: #999;
+	font-size: 11px;
+	margin-left: 15px;
+}
+
+#youtube-comments a.author-name:hover {
+	text-decoration: underline;
+}
+
+#youtube-comments .author-thumbnail {
+	position: absolute;
+	width: 48px;
+}
+
+#youtube-comments .comment-text {
+	line-height: 17px;
+}
+
+#youtube-comments .author-thumbnail img {
+	display: block;
+	width: 48px;
+}
+
+#youtube-comments div.comment-reply {
+	color: #999;
+	font-size: 11px;
+}
+
+#youtube-comments div.comment-reply a {
+	font-size: 11px;
+}
+
+#youtube-comments .show-more {
+	padding: 0 80px;
+}
+
+#youtube-comments .comments-pagination {
+	text-align: center;
+}
+
+#youtube-comments .youtube-button {
+	background-image: linear-gradient(to bottom, #fcfcfc 0px, #f8f8f8 100%);
+	border: 1px solid #d3d3d3;
+	border-radius: 2px;
+	color: #333;
+	font-size: 11px;
+	font-weight: bold;
+	line-height: 26px;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+#youtube-comments .youtube-button:hover {
+	background-image: linear-gradient(to bottom, #f8f8f8 0px, #eee 100%);
+	border-color: #c6c6c6;
+}
