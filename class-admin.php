@@ -158,7 +158,9 @@ class YouTubeCommentsAdmin {
 		$settings = get_option('yc_settings');
 		$value = empty($settings['api_key']) ? '' : $settings['api_key'];
 		echo "<input type='text' name='yc_settings[api_key]' class='regular-text' value='" . $value . "' />" . PHP_EOL;
-		echo "<p class='description'>Enter your credentials for the YouTube API.<br />Register <a href='https://developers.google.com/youtube/registering_an_application' target='_blank'>here</a> to create credentials.</p>" . PHP_EOL;
+		echo "<p class='description'>Enter your credentials for the YouTube API.<br />";
+		echo "Register <a href='https://developers.google.com/youtube/registering_an_application' target='_blank'>here</a> to get credentials.<br />";
+		echo "Credentials are only used to post comments.</p>" . PHP_EOL;
 	}	
 
 } // End Class	

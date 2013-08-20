@@ -3,10 +3,9 @@
 * Comments template for "YouTube Comments" plugin
 */
 
-$settings = get_option('yc_settings');
-if ($this->start_index == 1) { 
+if (1 == $start_index) { 
 ?>
-	<h4 class='comments-heading'><strong>All Comments</strong> (<?php echo $count; ?>)</h4>	
+	<h4 class='comments-heading'><strong>All Comments</strong> (<?php echo $total_results; ?>)</h4>	
 	<?php if (!empty($settings['post_comments'])) { ?>
 	<div class='post-comment'>
 		<?php	
@@ -74,6 +73,8 @@ foreach($comments->entry as $comment) {
 		</li>
 <?php } ?>
 	</ul>
+<?php	if ($total_results > ($start_index + $max_results)) { ?>
 	<div class='comments-pagination'>
 		<button type='button' class='show-more youtube-button'>Show more</button>
 	</div>
+<?php } // END

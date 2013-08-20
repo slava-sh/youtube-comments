@@ -5,8 +5,7 @@
 class YouTubeComments {
 	
 	protected static $instance = null;
-	const PLUGIN_VERSION = '1.0.0';
-	private $start_index = 1;
+	const PLUGIN_VERSION = '1.1.0';
 	private $client = null;
 	private $youtube = null;
 
@@ -101,7 +100,7 @@ class YouTubeComments {
 		global $post;
 		if (is_single() || is_page()) {	
 			$settings = get_option('yc_settings');
-			$results = empty($settings['results']) ? '10' : $settings['results'];
+			$results = empty($settings['max_results']) ? '10' : $settings['max_results'];
 			wp_enqueue_style('youtube-comments', plugins_url('style.css', __FILE__), array(), self::PLUGIN_VERSION);	
 			wp_enqueue_script('youtube-comments', plugins_url('script.js', __FILE__), array('jquery'), self::PLUGIN_VERSION, true);	
 			$content = get_post_field('post_content', $post->ID);
@@ -120,8 +119,8 @@ class YouTubeComments {
 	*/
 	public function ajax_get_comments() {
 		$video_id = $_POST['videoID'];
-		$this->start_index = $_POST['startIndex'];
-		$this->get_video_comments($video_id);
+		$start_index = $_POST['startIndex'];
+		$this->get_video_comments($video_id, $start_index);
 		exit;
 	}	
 	
@@ -206,6 +205,12 @@ class YouTubeComments {
 	* @return string
 	*/
 	public function get_first_video($content) {
+		global $post;
+		// Check for "Automatic YouTube Video Posts" plugin
+		$video_id = get_post_meta($post->ID, '_tern_wp_youtube_video', true);
+		if (!empty($video_id))
+			return $video_id;
+		// Otherwise, search content for link	
 		$pattern = '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i';
 		preg_match($pattern, $content, $match);	
 		if (empty($match[1]))
@@ -220,14 +225,14 @@ class YouTubeComments {
 	* @param string $video_id	
 	* @return array	
 	*/
-	public function get_video_comments($video_id) {
+	public function get_video_comments($video_id, $start_index = 1) {
 		$settings = get_option('yc_settings');
 		$max_results = empty($settings['max_results']) ? '10' : $settings['max_results'];
-		$query = '?start-index=' . $this->start_index . '&max-results=' . $max_results;
+		$query = '?start-index=' . $start_index . '&max-results=' . $max_results;
 		$uri = 'http://gdata.youtube.com/feeds/api/videos/' . $video_id . '/comments' . $query;
 		$comments = simplexml_load_file($uri);
-		$openSearch = $comments->children('openSearch', true);
-		$count = $openSearch->totalResults;
+		$open_search = $comments->children('openSearch', true);
+		$total_results = $open_search->totalResults;
 		include('template-comments.php');
 	}		
 	
