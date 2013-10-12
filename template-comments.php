@@ -48,8 +48,9 @@ foreach($comments->entry as $comment) {
 		$atts = $link->attributes();
 		if (strpos($atts->rel, 'in-reply-to')) {
 			$reply = @simplexml_load_file($atts->href); // suppress errors
-			if (isset($reply->author)) 
+			if (isset($reply->author)) {
 				$reply_link = sprintf("<a href='%s' title=''>%s</a>", $reply->author->uri, $reply->author->name);
+			}
 			break;
 		}			
 	}

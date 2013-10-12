@@ -5,9 +5,10 @@
 class YouTubeComments {
 	
 	protected static $instance = null;
-	const PLUGIN_VERSION = '1.1.0';
+	const PLUGIN_VERSION = '1.2.0';
 	private $client = null;
 	private $youtube = null;
+	private $has_video = false;
 
 	/**
 	* Constructor
@@ -35,6 +36,7 @@ class YouTubeComments {
 		add_action('wp_ajax_post_logoff', array($this, 'ajax_post_logoff'));
 		add_action('wp_ajax_nopriv_post_logoff', array($this, 'ajax_post_logoff'));				
 		add_shortcode('youtube-comments', array($this, 'handle_shortcode'));	
+		// Avoid adding container twice
 		if (!empty($settings['show_all'])) {
 			add_filter('the_content', array($this, 'filter_content'));
 		}
@@ -58,23 +60,25 @@ class YouTubeComments {
 	* @return string
 	*/
 	public function filter_content($content) {
-		if (is_single() || is_page()) {
-			if ($this->get_first_video($content))
-				$content .= $this->add_container();
+		if ($this->has_video) {
+			$content .= $this->add_container();
 		}
 		return $content;
 	}		
 
 	/**
 	* Handle shortcode
+	*
+	* @return string	
 	*/
 	public function handle_shortcode() {
 		if (is_single() || is_page()) {
 			$settings = get_option('yc_settings');
-			if (empty($settings['show_all']))
+			if ($this->has_video && empty($settings['show_all'])) {
 				return $this->add_container();
-			else
-				return ''; // Hide shortcode		
+			} else {
+				return ''; // Hide shortcode
+			}
 		}
 	}
 	
@@ -99,12 +103,15 @@ class YouTubeComments {
 	public function enqueue_scripts() {
 		global $post;
 		if (is_single() || is_page()) {	
+			$video_id = $this->get_first_video($post->ID);
+			if (empty($video_id)) {
+				return;
+			}
+			$this->has_video = true;
 			$settings = get_option('yc_settings');
 			$results = empty($settings['max_results']) ? '10' : $settings['max_results'];
 			wp_enqueue_style('youtube-comments', plugins_url('style.css', __FILE__), array(), self::PLUGIN_VERSION);	
 			wp_enqueue_script('youtube-comments', plugins_url('script.js', __FILE__), array('jquery'), self::PLUGIN_VERSION, true);	
-			$content = get_post_field('post_content', $post->ID);
-			$video_id = $this->get_first_video($content);
 			$vars = array(
 				'ajaxURL' => admin_url('admin-ajax.php'),
 				'videoID' => $video_id,
@@ -128,14 +135,17 @@ class YouTubeComments {
 	* Handle AJAX request for posting comment
 	*/
 	public function ajax_post_comment() {
-		if (!wp_verify_nonce($_POST['nonce'], 'post-comment'))
+		if (!wp_verify_nonce($_POST['nonce'], 'post-comment')) {
 			die('Error: Security check failed');
-		if (empty($_SESSION['access-token'])) 
+		}
+		if (empty($_SESSION['access-token'])) {
 			die('Error: No access token');
+		}
 		// Validate access token
 		$token = json_decode($_SESSION['access-token']);
-		if (!$this->validate_token($token->access_token))
+		if (!$this->validate_token($token->access_token)) {
 			die('Error: Access token invalid');
+		}
 		$this->client->setAccessToken($_SESSION['access-token']);
 		if ($this->client->isAccessTokenExpired()) {
 			$this->client->refreshToken($token->refresh-token);
@@ -171,8 +181,9 @@ class YouTubeComments {
 	* Handle AJAX request for logoff
 	*/
 	public function ajax_post_logoff() {
-		if (!wp_verify_nonce($_POST['nonce'], 'post-comment'))
+		if (!wp_verify_nonce($_POST['nonce'], 'post-comment')) {
 			die('Error: Security check failed');
+		}
 		unset($_SESSION['access-token']);
 		$this->client->revokeToken();
 		exit;
@@ -191,33 +202,79 @@ class YouTubeComments {
 			$values = json_decode($json);
 			if (empty($values->error)) {
 				$settings = get_option('yc_settings');
-				if (!empty($values->audience) && $values->audience == $settings['client_id'])
+				if (!empty($values->audience) && $values->audience == $settings['client_id']) {
 					return true;
+				}
 			}
 		}
 		return false;
 	}
 	
 	/**
-	* Parse content to get first video
+	* Search for first video ID
 	*
-	* @param string $content	
+	* @param integer $post_id	
 	* @return string
 	*/
-	public function get_first_video($content) {
-		global $post;
-		// Check for "Automatic YouTube Video Posts" plugin
-		$video_id = get_post_meta($post->ID, '_tern_wp_youtube_video', true);
-		if (!empty($video_id))
+	public function get_first_video($post_id) {
+		// Custom field for "Automatic YouTube Video Posts" plugin
+		if (function_exists('WP_ayvpp_init')) {
+			$video_id = get_post_meta($post_id, '_tern_wp_youtube_video', true);
+			if (!empty($video_id)) {
+				return $video_id;
+			}
+		}
+		// Custom field for "deTube" premium theme
+		$video_url = get_post_meta($post_id, 'dp_video_url', true);
+		if (!empty($video_url)) {
+			$video_id = $this->parse_youtube_url($video_url);
+			if (!empty($video_id)) {
+				return $video_id;	
+			}
+		}
+		// Other custom fields
+		$settings = get_option('yc_settings');
+		$fields = empty($settings['custom_fields']) ? '' : trim($settings['custom_fields']);
+		if (!empty($fields)) {
+			$fields = explode(',', $settings['custom_fields']);
+			foreach ($fields as $key) {
+				$key = trim($key);
+				$value = get_post_meta($post_id, $key, true);
+				$value = trim($value);
+				if (!empty($value)) {
+					// Custom field may contain URL or ID, so assume ID if not valid URL 
+					$video_id = $this->parse_youtube_url($value);
+					if (!empty($video_id)) {
+						return $video_id;	
+					} else {
+						return $value;
+					}
+				}
+			}
+		}
+		// Otherwise, search post content for URL
+		$content = get_post_field('post_content', $post_id);
+		$video_id = $this->parse_youtube_url($content);
+		if (!empty($video_id)) {
 			return $video_id;
-		// Otherwise, search content for link	
-		$pattern = '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i';
-		preg_match($pattern, $content, $match);	
-		if (empty($match[1]))
-			return false;
-		else
-			return $match[1];
+		}
+		return false;
 	}	
+	
+	/**
+	* Parse YouTube URL to get video ID
+	*
+	* @param string $url
+	* @return string
+	*/
+	public function parse_youtube_url($url) {	
+		$pattern = '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i';
+		preg_match($pattern, $url, $match);	
+		if (!empty($match[1])) {
+			return $match[1];
+		}
+		return false;	
+	}
 
 	/**
 	* Get video comments
@@ -283,12 +340,14 @@ class YouTubeComments {
 	*/	
 	function template_redirect() {	
 		if (isset($_GET['state']) && isset($_GET['code'])) {
-			if (strval($_SESSION['state']) !== strval($_GET['state']))
+			if (strval($_SESSION['state']) !== strval($_GET['state'])) {
 				die('The session state did not match.');
+			}
 			$this->client->authenticate($_GET['code']);
 			$_SESSION['access-token'] = $this->client->getAccessToken();
-			if (isset($_SESSION['redirect_url']))
+			if (isset($_SESSION['redirect_url'])) {
 				wp_safe_redirect($_SESSION['redirect_url']);
+			}
 		}
 	}
 	

@@ -3,8 +3,8 @@ Contributors: sydcode
 Donate link: 
 Tags: YouTube, video, comments
 Requires at least: 3.3
-Tested up to: 3.5.2
-Stable tag: 1.1.0
+Tested up to: 3.6.1
+Stable tag: 1.2.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -47,9 +47,13 @@ A developer account is only required to post comments. You can show comments wit
 
 The redirect URI must exactly match your site's URL. An extra trailing slash is enough to cause that error.
 
+= 5. Can I use a custom field for videos? =
+
+Yes, a setting is provided for custom fields. YouTube Comments supports the "Automatic YouTube Video Posts" plugin, and the "deTube" premium theme.
+
 == Upgrade Notice ==
 
-No upgrades available.
+No upgrade notices.
 
 == Changelog ==
 
@@ -59,4 +63,9 @@ No upgrades available.
 = 1.1.0 =
 * Added support for "Automatic YouTube Video Posts" plugin.
 * Fixed bug in comment display.
+* Updated the readme.
+
+= 1.2.0 =
+* Added support for "deTube" premium theme.
+* Added setting for URL custom fields.
 * Updated the readme.

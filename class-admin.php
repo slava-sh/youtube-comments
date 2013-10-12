@@ -51,8 +51,9 @@ class YouTubeCommentsAdmin {
 	*/	
 	public function settings_help() {
 		$screen = get_current_screen();
-		if ($screen->id != $this->settings_page)
+		if ($screen->id != $this->settings_page) {
 			return;
+		}
 		$screen->add_help_tab(array(
 			'id'      => 'ppf-overview',
 			'title'   => 'Overview',
@@ -74,10 +75,11 @@ class YouTubeCommentsAdmin {
 	* Load settings template
 	*/
 	public function settings_template() {
-		if (!current_user_can('manage_options'))
+		if (!current_user_can('manage_options')) {
 			wp_die( __('You do not have sufficient permissions to access this page.') );
-		else
+		} else {
 			include('template-settings.php');
+		}
 	}
 	
 	/**
@@ -96,6 +98,7 @@ class YouTubeCommentsAdmin {
 		add_settings_field('yc_settings_comments', 'Show Comments', array($this, 'settings_comments'), 'yc_settings_page', 'yc_settings_common'); 
 		add_settings_field('yc_settings_max_results', 'Request Comments', array($this, 'settings_max_results'), 'yc_settings_page', 'yc_settings_common'); 
 		add_settings_field('yc_settings_post_comments', 'Post Comments', array($this, 'settings_post_comments'), 'yc_settings_page', 'yc_settings_common'); 
+		add_settings_field('yc_settings_custom_fields', 'Custom Fields', array($this, 'settings_custom_fields'), 'yc_settings_page', 'yc_settings_common'); 
 		add_settings_field('yc_settings_client_id', 'Client ID', array($this, 'settings_client_id'), 'yc_settings_page', 'yc_settings_api'); 
 		add_settings_field('yc_settings_client_secret', 'Client Secret', array($this, 'settings_client_secret'), 'yc_settings_page', 'yc_settings_api'); 
 		add_settings_field('yc_settings_api_key', 'API Key', array($this, 'settings_api_key'), 'yc_settings_page', 'yc_settings_api'); 
@@ -132,6 +135,16 @@ class YouTubeCommentsAdmin {
 		echo "<label><input type='checkbox' name='yc_settings[post_comments]' value='1' " . $checked . " />&nbsp;&nbsp;Check to enable</label><br />" . PHP_EOL;
 		echo "<p class='description'>Allow users to post comments on YouTube.</p>" . PHP_EOL;
 	}
+	
+	/**
+	* Setting field for custom fields
+	*/
+	public function settings_custom_fields() {
+		$settings = get_option('yc_settings');
+		$value = empty($settings['custom_fields']) ? '' : $settings['custom_fields'];
+		echo "<input type='text' name='yc_settings[custom_fields]' class='regular-text' value='" . $value . "' />" . PHP_EOL;
+		echo "<p class='description'>Enter the names of custom fields for videos.<br />Separate multiple names with commas.</p>" . PHP_EOL;
+	}		
 
 	/**
 	* Setting field for client ID
