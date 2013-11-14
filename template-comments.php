@@ -35,11 +35,23 @@ if (1 == $start_index) {
 <?php 
 foreach($comments->entry as $comment) { 
 	// Get author metadata
+	$author = false;
 	$author_uri = $comment->author->uri;
-	$author = simplexml_load_file($author_uri);
-	$author_link = $author->link->attributes();
-	$media = $author->children('media', true);
-	$thumbnail = $media->thumbnail->attributes();
+	if (strpos($author_uri, '__NO_YOUTUBE_ACCOUNT__') === false) {
+		$author = @simplexml_load_file($author_uri); // suppress errors
+	}
+	if ($author) {
+		$link_atts = $author->link->attributes();
+		$link_href = $link_atts->href;
+		$media = $author->children('media', true);
+		$thumbnail_atts = $media->thumbnail->attributes();	
+		$thumbnail_url = $thumbnail_atts->url;
+	} else {
+		// Default values for private profiles
+		$link_href = '';
+		$thumbnail_url = plugins_url('profile.png', __FILE__);
+	}
+	$name = $comment->author->name;
 	$posted = $this->time_ago($comment->published);
 	$text = nl2br($comment->content);
 	// Get reply
@@ -57,11 +69,13 @@ foreach($comments->entry as $comment) {
 ?>
 		<li class='comment-item'>
 			<div class='author-thumbnail'>
-				<img src='<?php echo $thumbnail->url; ?>' alt='' />
+				<a href='<?php echo $link_href; ?>' title='<?php echo $name; ?>'>
+					<img src='<?php echo $thumbnail_url; ?>' alt='' />
+				</a>
 			</div>
 			<div class='comment-content'>
 				<span class='author-metadata'>
-					<a class='author-name' href='<?php echo $author_link->href; ?>'><?php echo $comment->author->name; ?></a>
+					<a class='author-name' href='<?php echo $link_href; ?>'><?php echo $name; ?></a>
 					<span class='comment-posted'><?php echo $posted; ?></span>
 				</span>
 				<div class='comment-text'>

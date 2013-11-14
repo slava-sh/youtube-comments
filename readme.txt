@@ -1,10 +1,10 @@
 ﻿=== YouTube Comments ===
 Contributors: sydcode
 Donate link: 
-Tags: YouTube, video, comments
+Tags: youtube, video, comments, video comments, google, social, social networks, social plugin, media
 Requires at least: 3.3
-Tested up to: 3.6.1
-Stable tag: 1.2.0
+Tested up to: 3.7.1
+Stable tag: 1.2.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -69,3 +69,6 @@ No upgrade notices.
 * Added support for "deTube" premium theme.
 * Added setting for URL custom fields.
 * Updated the readme.
+
+= 1.2.1 =
+* Fixed bug in user profile loader.

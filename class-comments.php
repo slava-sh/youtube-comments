@@ -5,7 +5,7 @@
 class YouTubeComments {
 	
 	protected static $instance = null;
-	const PLUGIN_VERSION = '1.2.0';
+	const PLUGIN_VERSION = '1.2.1';
 	private $client = null;
 	private $youtube = null;
 	private $has_video = false;

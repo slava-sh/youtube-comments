@@ -3,7 +3,7 @@
 
 Plugin Name: YouTube Comments
 Description: This plugin finds YouTube links in post content and imports the video comments. 
-Version: 1.2.0
+Version: 1.2.1
 Author: sydcode
 Author URI: http://profiles.wordpress.org/sydcode
 
