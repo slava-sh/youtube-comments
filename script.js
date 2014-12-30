@@ -63,7 +63,7 @@ jQuery(document).ready(function($) {
 	});
 	
 	// Logout link
-	$(document).on('click', 'span.post-comment-logout', function(event) {
+	$(document).on('click', 'a.post-comment-logout', function(event) {
 		var data = { 
 			action: 'post_logoff',
 			nonce: $('#post-comment-nonce').val()		
@@ -71,9 +71,28 @@ jQuery(document).ready(function($) {
 		$.post(youtubeComments.ajaxURL, data, function(response) { 
 			refreshComments();
 		});
+		return false;
+	});
+
+	$(document).on('click', '.post-comment-login a', function(event) {
+		var w = 600;
+		var h = 600;
+		var left = (window.screen.width - w) / 2;
+		var top = (window.screen.height - h) / 2;
+		var win = window.open(this.getAttribute('href'), '_blank', 'width=' + w + ',height=' + h + ',left=' + left + ',top=' + top + ',location=yes,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no');
+		var interval = window.setInterval(function() {
+			try {
+				if (win == null || win.closed) {
+					window.clearInterval(interval);
+					refreshComments();
+				}
+			}
+			catch (e) {
+			}
+		}, 1000);
+		return false;
 	});
 
 	// Get initial comments
 	showMoreComments();
-
 });

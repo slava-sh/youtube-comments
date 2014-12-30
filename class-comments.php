@@ -338,16 +338,16 @@ class YouTubeComments {
 	* Handle redirection after authentication
 	*/	
 	function template_redirect() {	
-		if (isset($_GET['state']) && isset($_GET['code'])) {
+		if (isset($_GET['state'])) {
+			if (isset($_GET['code'])) {
 			if (strval($_SESSION['state']) !== strval($_GET['state'])) {
 				die('The session state did not match.');
 			}
 			$this->client->authenticate($_GET['code']);
 			$_SESSION['access-token'] = $this->client->getAccessToken();
-			if (isset($_SESSION['redirect_url'])) {
-				wp_safe_redirect($_SESSION['redirect_url']);
 			}
+			echo '<!DOCTYPE html><html><head><script>window.close();window.addEventListener("load",window.close);</script></head><body>Please close this window.</body></html>';
+			exit;
 		}
 	}
-	
 } // End Class

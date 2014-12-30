@@ -53,15 +53,6 @@
 	width: 98%;
 }
 
-#youtube-comments .post-comment-logout {
-	color: #2793E6;
-	cursor: pointer;
-}
-
-#youtube-comments .post-comment-logout:hover {
-	text-decoration: underline;
-}
-
 #youtube-comments .post-comment-controls {
 	overflow: hidden;
 }

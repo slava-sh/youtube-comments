@@ -15,7 +15,7 @@ if (1 == $start_index) {
 			$_SESSION['state'] = $state;	
 		?>
 		<div class='post-comment-login'>
-			<p><a href='<?php echo $this->client->createAuthUrl(); ?>'>Sign in</a> now to post a comment!<p>	
+			<p><a href='<?php echo $this->client->createAuthUrl(); ?>'>Sign in</a> now to post a comment</p>
 		</div>
 		<?php } else { ?>
 		<form method='post' class='post-comment-form'>
@@ -23,7 +23,7 @@ if (1 == $start_index) {
 			<textarea type='text' class='post-comment-text' name='comment' placeholder='Leave a comment'></textarea>
 			<div class='post-comment-controls'>
 				<span class='post-comment-count'>500</span> characters remaining.
-				Click <span class='post-comment-logout'>here</span> to sign out.
+				Click <a href="javascript://" class='post-comment-logout'>here</a> to sign out.
 				<button type='submit' class='post-comment-submit youtube-button'>Post</button>
 			</div>
 		</form>			
