@@ -5,7 +5,7 @@
 
 if (1 == $start_index) { 
 ?>
-	<h4 class='comments-heading'><strong>All Comments</strong> (<?php echo $total_results; ?>)</h4>	
+	<h4 class='comments-heading'><strong>All Comments</strong> (<?php echo $total_results; ?>)<?php if (empty($settings['post_comments'])): ?> - Visit YouTube to comment<?php endif ?></h4>
 	<?php if (!empty($settings['post_comments'])) { ?>
 	<div class='post-comment'>
 		<div class='post-comment-success'>
