@@ -5,6 +5,7 @@
 jQuery(document).ready(function($) {
 
 	var startIndex = 1;
+	var just_posted = false;
 
 	// Get comments via AJAX
 	function showMoreComments() {
@@ -16,6 +17,10 @@ jQuery(document).ready(function($) {
 		$.post(youtubeComments.ajaxURL, data, function(response) { 
 			$('.comments-loading, .comments-pagination').hide();
 			$('#youtube-comments').append(response);
+			if (just_posted) {
+				$('.post-comment-form').hide();
+				$('.post-comment-success').show();
+			}
 			startIndex = startIndex + parseInt(youtubeComments.results);
 		});
 	}
@@ -48,6 +53,7 @@ jQuery(document).ready(function($) {
 			nonce: $('#post-comment-nonce').val()
 		};		
 		$.post(youtubeComments.ajaxURL, data, function(response) { 
+			just_posted = true;
 			refreshComments();
 		});
 	});

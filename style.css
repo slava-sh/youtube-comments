@@ -36,6 +36,10 @@
 	margin: 0 0 25px 0;
 }
 
+#youtube-comments .post-comment-success {
+	display: none;
+}
+
 #youtube-comments .post-comment-login {
 	background: #eee;
 	border: 1px solid #ccc;

@@ -8,6 +8,9 @@ if (1 == $start_index) {
 	<h4 class='comments-heading'><strong>All Comments</strong> (<?php echo $total_results; ?>)</h4>	
 	<?php if (!empty($settings['post_comments'])) { ?>
 	<div class='post-comment'>
+		<div class='post-comment-success'>
+			<p>Your comment has been posted and will appear soon</p>
+		</div>
 		<?php	
 		if (empty($_SESSION['access-token'])) {
 			$state = uniqid('', true);
