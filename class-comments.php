@@ -288,9 +288,11 @@ class YouTubeComments {
 		$query = '?start-index=' . $start_index . '&max-results=' . $max_results;
 		$uri = 'http://gdata.youtube.com/feeds/api/videos/' . $video_id . '/comments' . $query;
 		$comments = simplexml_load_file($uri);
-		$open_search = $comments->children('openSearch', true);
-		$total_results = $open_search->totalResults;
-		include('template-comments.php');
+		if ($comments) {
+			$open_search = $comments->children('openSearch', true);
+			$total_results = $open_search->totalResults;
+			include('template-comments.php');
+		}
 	}		
 	
 	/**
