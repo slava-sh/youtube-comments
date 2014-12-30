@@ -165,8 +165,9 @@ class YouTubeComments {
 		$header[] = 'GData-Version: 2';
 		$header[] = 'X-GData-Key: key=' . $settings['api_key'];
 		// Post comment
-		$url = 'http://gdata.youtube.com/feeds/api/videos/' . $_POST['videoID'] . '/comments';
+		$url = 'https://gdata.youtube.com/feeds/api/videos/' . $_POST['videoID'] . '/comments';
 		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($curl, CURLOPT_URL, $url); 
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl, CURLOPT_POST, true); 
