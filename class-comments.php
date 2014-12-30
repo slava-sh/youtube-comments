@@ -214,53 +214,35 @@ class YouTubeComments {
 	/**
 	* Search for first video ID
 	*
-	* @param integer $post_id	
+	* @param integer $post_id
 	* @return string
 	*/
 	public function get_first_video($post_id) {
-		// Custom field for "Automatic YouTube Video Posts" plugin
-		if (function_exists('WP_ayvpp_init')) {
-			$video_id = get_post_meta($post_id, '_tern_wp_youtube_video', true);
-			if (!empty($video_id)) {
-				return $video_id;
-			}
-		}
-		// Custom field for "deTube" premium theme
-		$video_url = get_post_meta($post_id, 'dp_video_url', true);
-		if (!empty($video_url)) {
-			$video_id = $this->parse_youtube_url($video_url);
-			if (!empty($video_id)) {
-				return $video_id;	
-			}
-		}
-		// Other custom fields
 		$settings = get_option('yc_settings');
 		$fields = empty($settings['custom_fields']) ? '' : trim($settings['custom_fields']);
-		if (!empty($fields)) {
-			$fields = explode(',', $settings['custom_fields']);
-			foreach ($fields as $key) {
-				$key = trim($key);
-				$value = get_post_meta($post_id, $key, true);
-				$value = trim($value);
-				if (!empty($value)) {
-					// Custom field may contain URL or ID, so assume ID if not valid URL 
-					$video_id = $this->parse_youtube_url($value);
-					if (!empty($video_id)) {
-						return $video_id;	
-					} else {
-						return $value;
-					}
+		$fields = explode(',', $settings['custom_fields']);
+		$fields = array_merge($fields, array(
+			'_tern_wp_youtube_video', // "Automatic YouTube Video Posts" plugin
+			'dp_video_url',           // "deTube" premium theme
+			'wpzoom_post_embed_code',
+			'post_content',
+		));
+		foreach ($fields as $key) {
+			$key = trim($key);
+			$value = get_post_meta($post_id, $key, true);
+			$value = trim($value);
+			if (!empty($value)) {
+				// Custom field may contain URL or ID, so assume ID if not valid URL
+				$video_id = $this->parse_youtube_url($value);
+				if (!empty($video_id)) {
+					return $video_id;
+				} else {
+					return $value;
 				}
 			}
 		}
-		// Otherwise, search post content for URL
-		$content = get_post_field('post_content', $post_id);
-		$video_id = $this->parse_youtube_url($content);
-		if (!empty($video_id)) {
-			return $video_id;
-		}
 		return false;
-	}	
+	}
 	
 	/**
 	* Parse YouTube URL to get video ID
