@@ -229,7 +229,15 @@ class YouTubeComments {
 		));
 		foreach ($fields as $key) {
 			$key = trim($key);
-			$value = get_post_meta($post_id, $key, true);
+			if (empty($key)) {
+				continue;
+			}
+			if ($key === 'post_content') {
+				$value = get_post($post_id)->post_content;
+			}
+			else {
+				$value = get_post_meta($post_id, $key, true);
+			}
 			$value = trim($value);
 			if (!empty($value)) {
 				// Custom field may contain URL or ID, so assume ID if not valid URL
@@ -267,16 +275,14 @@ class YouTubeComments {
 	*/
 	public function get_video_comments($video_id, $start_index = 1) {
 		$settings = get_option('yc_settings');
+		$key = $settings['api_key'];
 		$max_results = empty($settings['max_results']) ? '10' : $settings['max_results'];
-		$query = '?start-index=' . $start_index . '&max-results=' . $max_results;
-		$uri = 'http://gdata.youtube.com/feeds/api/videos/' . $video_id . '/comments' . $query;
-		$comments = simplexml_load_file($uri);
-		if ($comments) {
-			$open_search = $comments->children('openSearch', true);
-			$total_results = $open_search->totalResults;
-			include('template-comments.php');
-		}
-	}		
+		$url = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=${video_id}&maxResults=${max_results}&key=${key}";
+		$response = json_decode(file_get_contents($url));
+		$nextPageToken = $response->nextPageToken;
+		$commentThreads = $response->items;
+		include('template-comments.php');
+	}
 	
 	/**
 	* Get time since comment posted
