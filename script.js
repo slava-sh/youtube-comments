@@ -4,7 +4,7 @@
 
 jQuery(document).ready(function($) {
 
-	var startIndex = 1;
+	var nextPageToken = null;
 	var just_posted = false;
 
 	// Get comments via AJAX
@@ -12,23 +12,23 @@ jQuery(document).ready(function($) {
 		var data = {
 			action: 'get_comments',
 			videoID: youtubeComments.videoID,
-			startIndex: startIndex
+			nextPageToken: nextPageToken
 		};
-		$.post(youtubeComments.ajaxURL, data, function(response) { 
+		$.post(youtubeComments.ajaxURL, data, function(response) {
 			$('.comments-loading, .comments-pagination').hide();
-			$('#youtube-comments').append(response);
+			$('#youtube-comments').append(response.html);
 			if (just_posted) {
 				$('.post-comment-form').hide();
 				$('.post-comment-success').show();
 			}
-			startIndex = startIndex + parseInt(youtubeComments.results);
-		});
+			nextPageToken = response.nextPageToken;
+		}, 'json');
 	}
 	
 	function refreshComments() {
 		$('.comments-heading, .post-comment, .comments-list, .comments-pagination').remove();
 		$('.comments-loading').show();
-		startIndex = 1;
+		nextPageToken = null;
 		showMoreComments();	
 	}
 

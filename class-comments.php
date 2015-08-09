@@ -126,8 +126,8 @@ class YouTubeComments {
 	*/
 	public function ajax_get_comments() {
 		$video_id = $_POST['videoID'];
-		$start_index = $_POST['startIndex'];
-		$this->get_video_comments($video_id, $start_index);
+		$nextPageToken = $_POST['nextPageToken'];
+		$this->get_video_comments($video_id, $nextPageToken);
 		exit;
 	}	
 	
@@ -273,15 +273,21 @@ class YouTubeComments {
 	* @param string $video_id	
 	* @return array	
 	*/
-	public function get_video_comments($video_id, $start_index = 1) {
+	public function get_video_comments($video_id, $pageToken = '') {
 		$settings = get_option('yc_settings');
 		$key = $settings['api_key'];
 		$max_results = empty($settings['max_results']) ? '10' : $settings['max_results'];
-		$url = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=${video_id}&maxResults=${max_results}&key=${key}";
+		$url = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=${video_id}&maxResults=${max_results}&key=${key}&pageToken=${pageToken}";
 		$response = json_decode(file_get_contents($url));
 		$nextPageToken = $response->nextPageToken;
 		$commentThreads = $response->items;
+		ob_start();
 		include('template-comments.php');
+		$html = ob_get_clean();
+		echo json_encode(array(
+			'html' => $html,
+			'nextPageToken' => $nextPageToken,
+		));
 	}
 	
 	/**

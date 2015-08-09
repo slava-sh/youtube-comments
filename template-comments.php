@@ -3,7 +3,7 @@
 * Comments template for "YouTube Comments" plugin
 */
 
-if (1 == $start_index) { 
+if (empty($pageToken)) {
 ?>
 	<h4 class='comments-heading'><strong>Comments</strong><?php if (empty($settings['post_comments'])): ?> - Visit YouTube to comment<?php endif ?></h4>
 	<?php if (!empty($settings['post_comments'])) { ?>
